@@ -56,6 +56,7 @@ Configure Claude Desktop to recognize the Exa MCP server.
 
 2. Add the server configuration
 
+   for Cursor:
     ```json
     {
       "mcpServers": {
@@ -69,3 +70,20 @@ Configure Claude Desktop to recognize the Exa MCP server.
       }
     }
     ```
+   
+   for Claude desktop:
+   ```json
+   {
+     "mcpServers": {
+       "telegram": {
+         "command": "telegram-mcp",
+         "env": {
+            "TG_APP_ID": "<your-app-id>",
+            "TG_API_HASH": "<your-api-hash>",
+            "PATH": "<path_to_telegram-mcp_binary_dir>",
+            "HOME": "<path_to_your_home_directory"
+         }
+       }
+     }
+   }
+   ```
