@@ -41,12 +41,29 @@ func serve(ctx context.Context, cmd *cli.Command) error {
 
 		log.Info().RawJSON("answer", data).Msg("Check GetMe: OK")
 
+		answer, err = client.GetDialogs(tg.DialogsArguments{})
+		if err != nil {
+			return fmt.Errorf("get dialogs: %w", err)
+		}
+
+		data, err = json.MarshalIndent(answer, "", "  ")
+		if err != nil {
+			return fmt.Errorf("marshal: %w", err)
+		}
+
+		log.Info().RawJSON("answer", data).Msg("Check GetDialogs: OK")
+
 		return nil
 	}
 
 	err = server.RegisterTool("me", "Get current Telegram account info", client.GetMe)
 	if err != nil {
 		return fmt.Errorf("register tool: %w", err)
+	}
+
+	err = server.RegisterTool("dialogs", "Get list of dialogs (chats, channels, groups)", client.GetDialogs)
+	if err != nil {
+		return fmt.Errorf("register dialogs tool: %w", err)
 	}
 
 	if err := server.Serve(); err != nil {

@@ -20,8 +20,9 @@ type EmptyArguments struct{}
 func (c *Client) GetMe(_ EmptyArguments) (*mcp.ToolResponse, error) {
 	var toolResponse *mcp.ToolResponse
 
-	if err := c.T.Run(context.Background(), func(ctx context.Context) error {
-		self, err := c.T.Self(ctx)
+	client := c.T()
+	if err := client.Run(context.Background(), func(ctx context.Context) error {
+		self, err := client.Self(ctx)
 		if err != nil {
 			return errors.Wrap(err, "failed to get self info")
 		}

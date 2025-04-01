@@ -39,7 +39,7 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	client := tg.New(appID, apiHash, sessionPath).T
+	client := tg.New(appID, apiHash, sessionPath).T()
 
 	if err := client.Run(ctx, func(ctx context.Context) error {
 		self, err := client.Self(ctx)
