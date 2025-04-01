@@ -18,6 +18,17 @@ func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
+	debugPath := os.Getenv("TG_DEBUG_LOG")
+	if debugPath != "" {
+		logFile, err := os.OpenFile(debugPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to open debug log file")
+		}
+
+		log.Logger = log.Output(logFile)
+		log.Info().Msgf("Enabling debug logging to %s", debugPath)
+	}
+
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to get home dir")

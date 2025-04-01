@@ -30,8 +30,15 @@ tasks:
     desc: Install MCP server to user's local bin
     deps: [build]
     cmds:
+      - rm -f ~/.local/bin/telegram-mcp
       - cp ./bin/telegram-mcp ~/.local/bin/
       - chmod +x ~/.local/bin/telegram-mcp
+  
+  run:sys:
+    desc: Run system test
+    deps: [install]
+    cmds:
+      - telegram-mcp {{.CLI_ARGS}}
 
   lint:
     desc: Run linter
