@@ -160,18 +160,17 @@ func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
 		return nil, errors.Wrap(err, "failed to get dialogs")
 	}
 
-	// Convert response to JSON
-	jsonData, err := json.Marshal(result)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to marshal response")
-	}
-
 	sort.Slice(result, func(i, j int) bool {
 		return result[i].LastMessageID > result[j].LastMessageID
 	})
 
 	if len(result) > args.Limit {
 		result = result[:args.Limit]
+	}
+
+	jsonData, err := json.Marshal(result)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal response")
 	}
 
 	return mcp.NewToolResponse(mcp.NewTextContent(string(jsonData))), nil
