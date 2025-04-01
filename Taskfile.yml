@@ -42,6 +42,6 @@ tasks:
 
   lint:
     desc: Run linter
-    cmd: golangci-lint run ./...
+    cmd: golangci-lint run --fix ./...
 
 

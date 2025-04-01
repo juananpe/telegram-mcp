@@ -70,3 +70,4 @@ session.json
 bin/
 .env
 .cursor/
+log.txt
