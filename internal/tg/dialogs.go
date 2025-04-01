@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/gotd/td/tg"
 	mcp "github.com/metoro-io/mcp-golang"
@@ -28,20 +29,27 @@ const (
 	DefaultDialogsLimit = 100
 )
 
-// DialogsArguments contains parameters for getting dialogs
 type DialogsArguments struct {
-	Type  DialogType `json:"type,omitempty" jsonschema:"description=Filter dialogs by type (user, chat, channel or empty for all),enum=,enum=user,enum=chat,enum=channel"`
-	Limit int        `json:"limit,omitempty" jsonschema:"description=Maximum number of dialogs to return (max: 100),default=100"`
+	Type             DialogType `json:"type,omitempty" jsonschema:"description=Filter dialogs by type (user, chat, channel or empty for all),enum=,enum=user,enum=chat,enum=channel"`
+	Limit            int        `json:"limit,omitempty" jsonschema:"description=Maximum number of dialogs to return (max: 100),default=100"`
+	WithLastMessages bool       `json:"with_last_messages,omitempty" jsonschema:"description=Include last messages in response"`
 }
 
-// DialogInfo represents a simplified dialog structure
+type MessageInfo struct {
+	Who      string `json:"who"`
+	When     string `json:"when"`
+	Text     string `json:"text"`
+	IsUnread bool   `json:"is_unread,omitempty"`
+}
+
 type DialogInfo struct {
-	ID            int64  `json:"id"`
-	Type          string `json:"type"`
-	Title         string `json:"title"`
-	UnreadCount   int    `json:"unread_count"`
-	LastMessageID int    `json:"last_message_id"`
-	IsVerified    bool   `json:"is_verified,omitempty"`
+	ID            int64         `json:"id"`
+	Type          string        `json:"type"`
+	Title         string        `json:"title"`
+	UnreadCount   int           `json:"unread_count"`
+	LastMessageID int           `json:"last_message_id"`
+	IsVerified    bool          `json:"is_verified,omitempty"`
+	LastMessages  []MessageInfo `json:"last_messages,omitempty"`
 }
 
 // GetDialogs returns a list of dialogs (chats, channels, groups)
@@ -92,6 +100,22 @@ func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
 			var info DialogInfo
 			info.UnreadCount = dialogItem.UnreadCount
 			info.LastMessageID = dialogItem.TopMessage
+
+			if args.WithLastMessages {
+				for _, msg := range dialogs.Messages {
+					message, ok := msg.(*tg.Message)
+					if !ok {
+						continue
+					}
+
+					info.LastMessages = append(info.LastMessages, MessageInfo{
+						Who:      message.FromID.String(),
+						When:     time.Unix(int64(message.Date), 0).Format(time.DateTime),
+						Text:     message.Message,
+						IsUnread: !message.Out,
+					})
+				}
+			}
 
 			switch peer := dialogItem.Peer.(type) {
 			case *tg.PeerUser:
