@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"telegram-mcp/internal/tg"
+
+	"github.com/chaindead/telegram-mcp/internal/tg"
 
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v3"
