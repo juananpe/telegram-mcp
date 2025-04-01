@@ -1,0 +1,40 @@
+# https://taskfile.dev
+
+version: '3'
+
+dotenv: [".env"]
+
+tasks:
+  mod:
+    desc: Sync go.mod
+    cmds:
+      - go mod download
+      - go mod tidy
+
+  run:test:
+    desc: Run test command
+    cmds:
+      - go run ./cmd/test/...
+
+  run:
+    desc: Run CLI app
+    cmds:
+      - go run ./. {{.CLI_ARGS}}
+
+  build:
+    cmds:
+      - mkdir -p ./bin
+      - go build -o ./bin/telegram-mcp ./.
+
+  install:
+    desc: Install MCP server to user's local bin
+    deps: [build]
+    cmds:
+      - cp ./bin/telegram-mcp ~/.local/bin/
+      - chmod +x ~/.local/bin/telegram-mcp
+
+  lint:
+    desc: Run linter
+    cmd: golangci-lint run ./...
+
+
