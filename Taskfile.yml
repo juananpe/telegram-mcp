@@ -22,6 +22,8 @@ tasks:
       - go run ./. {{.CLI_ARGS}}
 
   build:
+    env:
+      CGO_ENABLED: 0
     cmds:
       - mkdir -p ./bin
       - go build -o ./bin/telegram-mcp ./.
