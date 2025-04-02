@@ -22,6 +22,39 @@ The Model Context Protocol (MCP) is a system that lets AI apps, like Claude Desk
 
 ## Installation
 
+### From Releases
+
+#### Windows
+1. Download the latest release for your architecture:
+   - [Windows x64](https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Windows_x86_64.zip)
+   - [Windows ARM64](https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Windows_arm64.zip)
+2. Extract the `.zip` file
+3. Add the extracted directory to your PATH or move `telegram-mcp.exe` to a directory in your PATH
+
+#### macOS
+```bash
+# Intel Mac (x86_64)
+curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Darwin_x86_64.tar.gz | tar xz -C /usr/local/bin
+
+# Apple Silicon (M1/M2)
+curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Darwin_arm64.tar.gz | tar xz -C /usr/local/bin
+```
+
+#### Linux
+```bash
+# x86_64 (64-bit)
+curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin
+
+# ARM64
+curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Linux_arm64.tar.gz | tar xz -C /usr/local/bin
+```
+
+### From Source
+
+Requirements:
+- Go 1.24 or later
+- GOBIN in PATH
+
 ```bash
 go install github.com/chaindead/telegram-mcp@latest
 ```
@@ -58,19 +91,19 @@ Example of Configuring Claude Desktop to recognize the Telegram MCP server.
    
    for Claude desktop:
    ```json
-   {
-     "mcpServers": {
-       "telegram": {
-         "command": "telegram-mcp",
-         "env": {
+    {
+      "mcpServers": {
+        "telegram": {
+          "command": "telegram-mcp",
+          "env": {
             "TG_APP_ID": "<your-app-id>",
             "TG_API_HASH": "<your-api-hash>",
             "PATH": "<path_to_telegram-mcp_binary_dir>",
             "HOME": "<path_to_your_home_directory"
-         }
-       }
-     }
-   }
+          }
+        }
+      }
+    }
    ```
 
    for Cursor:
