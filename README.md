@@ -6,6 +6,19 @@ The server is a bridge between the Telegram API and the AI assistants and is bas
 > Ensure that you have read and understood the [Telegram API Terms of Service](https://core.telegram.org/api/terms) before using this server.
 > Any misuse of the Telegram API may result in the suspension of your account.
 
+## Table of Contents
+- [What is MCP?](#what-is-mcp)
+- [What does this server do?](#what-does-this-server-do)
+- [Installation](#installation)
+  - [From Releases](#from-releases)
+    - [macOS](#macos)
+    - [Linux](#linux)
+    - [Windows](#windows)
+  - [From Source](#from-source)
+- [Configuration](#configuration)
+  - [Telegram API Configuration](#telegram-api-configuration)
+  - [Client Configuration](#client-configuration)
+
 ## What is MCP?
 
 The Model Context Protocol (MCP) is a system that lets AI apps, like Claude Desktop or Cursor, connect to external tools and data sources. It gives a clear and safe way for AI assistants to work with local services and APIs while keeping the user in control.
@@ -24,14 +37,11 @@ The Model Context Protocol (MCP) is a system that lets AI apps, like Claude Desk
 
 ### From Releases
 
-#### Windows
-1. Download the latest release for your architecture:
-   - [Windows x64](https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Windows_x86_64.zip)
-   - [Windows ARM64](https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Windows_arm64.zip)
-2. Extract the `.zip` file
-3. Add the extracted directory to your PATH or move `telegram-mcp.exe` to a directory in your PATH
 
 #### macOS
+
+> **Note:** The command above install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
+
 ```bash
 # Intel Mac (x86_64)
 curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Darwin_x86_64.tar.gz | tar xz -C /usr/local/bin
@@ -41,6 +51,9 @@ curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/teleg
 ```
 
 #### Linux
+
+> **Note:** The commands install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
+
 ```bash
 # x86_64 (64-bit)
 curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin
@@ -48,6 +61,13 @@ curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/teleg
 # ARM64
 curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Linux_arm64.tar.gz | tar xz -C /usr/local/bin
 ```
+
+#### Windows
+1. Download the latest release for your architecture:
+   - [Windows x64](https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Windows_x86_64.zip)
+   - [Windows ARM64](https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Windows_arm64.zip)
+2. Extract the `.zip` file
+3. Add the extracted directory to your PATH or move `telegram-mcp.exe` to a directory in your PATH
 
 ### From Source
 
