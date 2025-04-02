@@ -71,3 +71,4 @@ bin/
 .env
 .cursor/
 log.txt
+mcp.log

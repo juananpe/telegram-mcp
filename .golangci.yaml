@@ -29,7 +29,6 @@ linters:
     - ineffassign
     - staticcheck
     - unused
-    - depguard
     - asciicheck
     - bodyclose
     - canonicalheader
@@ -65,41 +64,12 @@ linters-settings:
   lll:
     line-length: 150
 
-  goimports:
-    local-prefixes: "gitlab.com/v8s/trating"
-
-  depguard:
-    rules:
-      configuration:
-        files:
-          - $all
-          - "!**/internal/config/*.go"
-        deny:
-          - pkg: "github.com/spf13/viper"
-            desc: Should be used only in config package, to avoid boiler plate
-
-      replace-std:
-        list-mode: lax
-        files:
-          - "**/internal/**/*.go"
-        deny:
-          - pkg: "errors"
-            desc: Use github.com/pkg/errors for proper callstack logging (check README.md)
-          - pkg: "log"
-            desc: Use github.com/rs/zerolog/log as replacement
-
-  importas:
-    no-unaliased: true
-    alias:
-      # enforce easycfg like usage
-      - pkg: github.com/spf13/pflag
-        alias: cfg
-
   wrapcheck:
     ignoreSigs:
       - github.com/pkg/errors.Wrap(
       - github.com/pkg/errors.Wrapf(
       - github.com/pkg/errors.New(
+      - fmt.Errorf
 
   gocyclo:
     min-complexity: 15

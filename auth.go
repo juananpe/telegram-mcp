@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"strconv"
 
 	"github.com/chaindead/telegram-mcp/internal/tg"
 
@@ -34,7 +34,7 @@ func authCommand(_ context.Context, cmd *cli.Command) error {
 			Command string `json:"command"`
 			Env     struct {
 				AppID   string `json:"TG_APP_ID"`
-				ApiHash string `json:"TG_API_HASH"`
+				APIHash string `json:"TG_API_HASH"`
 			} `json:"env"`
 		} `json:"telegram"`
 	}{
@@ -42,16 +42,16 @@ func authCommand(_ context.Context, cmd *cli.Command) error {
 			Command string `json:"command"`
 			Env     struct {
 				AppID   string `json:"TG_APP_ID"`
-				ApiHash string `json:"TG_API_HASH"`
+				APIHash string `json:"TG_API_HASH"`
 			} `json:"env"`
 		}{
 			Command: "telegram-mcp",
 			Env: struct {
 				AppID   string `json:"TG_APP_ID"`
-				ApiHash string `json:"TG_API_HASH"`
+				APIHash string `json:"TG_API_HASH"`
 			}{
-				AppID:   fmt.Sprintf("%d", appID),
-				ApiHash: apiHash,
+				AppID:   strconv.FormatInt(appID, 10),
+				APIHash: apiHash,
 			},
 		},
 	}

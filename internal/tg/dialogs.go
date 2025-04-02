@@ -29,6 +29,7 @@ const (
 	DefaultDialogsLimit = 100
 )
 
+// nolint:lll
 type DialogsArguments struct {
 	Type             DialogType `json:"type,omitempty" jsonschema:"description=Filter dialogs by type (user, chat, channel or empty for all),enum=,enum=user,enum=chat,enum=channel"`
 	Limit            int        `json:"limit,omitempty" jsonschema:"description=Maximum number of dialogs to return (max: 100),default=100"`
@@ -86,7 +87,7 @@ func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
 				Users:    d.Users,
 			}
 		default:
-			return fmt.Errorf("unexpected dialogs response type")
+			return errors.New("unexpected dialogs response type")
 		}
 
 		result = make([]DialogInfo, 0, len(dialogs.Dialogs))
@@ -108,8 +109,13 @@ func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
 						continue
 					}
 
+					var who string
+					if message.FromID != nil {
+						who = message.FromID.String()
+					}
+
 					info.LastMessages = append(info.LastMessages, MessageInfo{
-						Who:      message.FromID.String(),
+						Who:      who,
 						When:     time.Unix(int64(message.Date), 0).Format(time.DateTime),
 						Text:     message.Message,
 						IsUnread: !message.Out,
@@ -135,6 +141,7 @@ func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
 					info.IsVerified = user.Verified
 
 					result = append(result, info)
+
 					break
 				}
 
@@ -154,6 +161,7 @@ func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
 					info.Title = chat.Title
 
 					result = append(result, info)
+
 					break
 				}
 
@@ -174,6 +182,7 @@ func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
 					info.IsVerified = channel.Verified
 
 					result = append(result, info)
+
 					break
 				}
 			}
@@ -206,5 +215,6 @@ func getUserName(user *tg.User) string {
 	if user.LastName != "" {
 		name += " " + user.LastName
 	}
+
 	return name
 }

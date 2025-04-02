@@ -28,12 +28,13 @@ func Auth(phone string, appID int64, appHash string, sessionPath string) error {
 
 	if err := client.Run(context.Background(), func(ctx context.Context) error {
 		// Authenticate if needed
-		flow := auth.NewFlow(auth.Constant(phone, "", auth.CodeAuthenticatorFunc(func(ctx context.Context, _ *tg.AuthSentCode) (string, error) {
+		flow := auth.NewFlow(auth.Constant(phone, "", auth.CodeAuthenticatorFunc(func(_ context.Context, _ *tg.AuthSentCode) (string, error) {
 			fmt.Print("Enter code: ")
 			code, err := bufio.NewReader(os.Stdin).ReadString('\n')
 			if err != nil {
-				return "", err
+				return "", fmt.Errorf("read code: %w", err)
 			}
+
 			return strings.TrimSpace(code), nil
 		})), auth.SendCodeOptions{})
 
