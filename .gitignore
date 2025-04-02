@@ -72,3 +72,4 @@ bin/
 .cursor/
 log.txt
 mcp.log
+dist/

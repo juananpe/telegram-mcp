@@ -16,24 +16,13 @@ builds:
       - -s -w
 
 archives:
-  - name_template: >-
-      {{ .ProjectName }}_{{ .Version }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else }}{{ .Arch }}{{ end }}
-    wrap_in_directory: false
-    files:
-      - none*
+  - format_overrides:
+    - formats:  'zip'
+      goos: windows
 
 changelog:
   use: github
   sort: asc
-  groups:
-    - title: Release Notes
-      regexp: ".*"
-  filters:
-    exclude:
-      - ".*"
 
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
