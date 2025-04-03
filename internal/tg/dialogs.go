@@ -11,30 +11,26 @@ import (
 	"github.com/gotd/td/tg"
 	mcp "github.com/metoro-io/mcp-golang"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 )
 
 // DialogType represents the type of dialog for filtering
 type DialogType string
 
 const (
-	// DialogTypeAll represents all types of dialogs
-	DialogTypeAll DialogType = ""
-	// DialogTypeUser represents user chats
-	DialogTypeUser DialogType = "user"
-	// DialogTypeChat represents group chats
-	DialogTypeChat DialogType = "chat"
-	// DialogTypeChannel represents channels
+	DialogTypeUnknown DialogType = "unknown"
+	DialogTypeAll     DialogType = ""
+	DialogTypeUser    DialogType = "user"
+	DialogTypeBot     DialogType = "bot"
+	DialogTypeChat    DialogType = "chat"
 	DialogTypeChannel DialogType = "channel"
 
-	// DefaultDialogsLimit is the default limit for dialogs
 	DefaultDialogsLimit = 100
 )
 
 // nolint:lll
 type DialogsArguments struct {
-	Type             DialogType `json:"type,omitempty" jsonschema:"description=Filter dialogs by type (user, chat, channel or empty for all),enum=,enum=user,enum=chat,enum=channel"`
-	Limit            int        `json:"limit,omitempty" jsonschema:"description=Maximum number of dialogs to return (max: 100),default=100"`
-	WithLastMessages bool       `json:"with_last_messages,omitempty" jsonschema:"description=Include last messages in response"`
+	//WithLastMessages bool `json:"with_last_messages,omitempty" jsonschema:"description=Include last messages in response"`
 }
 
 type MessageInfo struct {
@@ -42,200 +38,266 @@ type MessageInfo struct {
 	When     string `json:"when"`
 	Text     string `json:"text"`
 	IsUnread bool   `json:"is_unread,omitempty"`
+	ts       int
 }
 
 type DialogInfo struct {
-	ID            int64         `json:"id"`
-	Type          string        `json:"type"`
-	Title         string        `json:"title"`
-	UnreadCount   int           `json:"unread_count"`
-	LastMessageID int           `json:"last_message_id"`
-	IsVerified    bool          `json:"is_verified,omitempty"`
-	LastMessages  []MessageInfo `json:"last_messages,omitempty"`
+	ID          int64        `json:"id"`
+	Type        string       `json:"type"`
+	Name        string       `json:"name"`
+	LastMessage *MessageInfo `json:"last_message,omitempty"`
 }
 
 // GetDialogs returns a list of dialogs (chats, channels, groups)
 func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
 	var result []DialogInfo
 
-	if args.Limit <= 0 || args.Limit > DefaultDialogsLimit {
-		args.Limit = DefaultDialogsLimit
-	}
-
-	if args.Type == "" {
-		args.Type = DialogTypeAll
-	}
-
+	var dc tg.MessagesDialogsClass
 	client := c.T()
-	if err := client.Run(context.Background(), func(ctx context.Context) error {
+	if err := client.Run(context.Background(), func(ctx context.Context) (err error) {
 		api := client.API()
-		dialogsClass, err := api.MessagesGetDialogs(ctx, &tg.MessagesGetDialogsRequest{
+		dc, err = api.MessagesGetDialogs(ctx, &tg.MessagesGetDialogsRequest{
 			OffsetPeer: &tg.InputPeerEmpty{},
-			Limit:      20,
 		})
 		if err != nil {
 			return fmt.Errorf("failed to get dialogs: %w", err)
 		}
 
 		// Debug
-		// jsonData, _ := json.Marshal(dialogsClass)
-		// log.Info().RawJSON("dialogs", cleanJSON(jsonData)).Msg("dialogs")
-
-		var dialogs *tg.MessagesDialogs
-		switch d := dialogsClass.(type) {
-		case *tg.MessagesDialogs:
-			dialogs = d
-		case *tg.MessagesDialogsSlice:
-			dialogs = &tg.MessagesDialogs{
-				Dialogs:  d.Dialogs,
-				Messages: d.Messages,
-				Chats:    d.Chats,
-				Users:    d.Users,
-			}
-		default:
-			return errors.New("unexpected dialogs response type")
-		}
-
-		messageMap := make(map[string][]*tg.Message)
-		for _, m := range dialogs.Messages {
-			msg, ok := m.(*tg.Message)
-			if !ok {
-				continue
-			}
-
-			if msg.PeerID == nil {
-				continue
-			}
-
-			messageMap[msg.PeerID.String()] = append(messageMap[msg.PeerID.String()], msg)
-		}
-
-		usersMap := make(map[string]tg.UserClass)
-		for _, u := range dialogs.Users {
-			usersMap["Peer"+u.String()] = u
-		}
-
-		result = make([]DialogInfo, 0, len(dialogs.Dialogs))
-
-		for _, dialog := range dialogs.Dialogs {
-			dialogItem, ok := dialog.(*tg.Dialog)
-			if !ok {
-				continue
-			}
-
-			var info DialogInfo
-			info.UnreadCount = dialogItem.UnreadCount
-			info.LastMessageID = dialogItem.TopMessage
-
-			if args.WithLastMessages {
-				msgs := messageMap[dialogItem.Peer.String()]
-				for _, msg := range msgs {
-					var who string
-					if msg.FromID != nil {
-						if u, ok := usersMap[msg.FromID.String()]; ok {
-							who = u.String()
-						}
-					}
-
-					// Limit message to 20 words
-					text := msg.Message
-					words := strings.Fields(text)
-					if len(words) > 20 {
-						text = strings.Join(words[:20], " ") + "..."
-					}
-
-					info.LastMessages = append(info.LastMessages, MessageInfo{
-						Who:      who,
-						When:     time.Unix(int64(msg.Date), 0).Format(time.DateTime),
-						Text:     text,
-						IsUnread: dialogItem.UnreadCount > 0,
-					})
-				}
-			}
-
-			switch peer := dialogItem.Peer.(type) {
-			case *tg.PeerUser:
-				if args.Type != DialogTypeAll && args.Type != DialogTypeUser {
-					continue
-				}
-
-				for _, userItem := range dialogs.Users {
-					user, ok := userItem.(*tg.User)
-					if !ok || user.ID != peer.UserID {
-						continue
-					}
-
-					info.ID = user.ID
-					info.Type = "user"
-					info.Title = getUserName(user)
-					info.IsVerified = user.Verified
-
-					result = append(result, info)
-
-					break
-				}
-
-			case *tg.PeerChat:
-				if args.Type != DialogTypeAll && args.Type != DialogTypeChat {
-					continue
-				}
-
-				for _, chatItem := range dialogs.Chats {
-					chat, ok := chatItem.(*tg.Chat)
-					if !ok || chat.ID != peer.ChatID {
-						continue
-					}
-
-					info.ID = chat.ID
-					info.Type = "chat"
-					info.Title = chat.Title
-
-					result = append(result, info)
-
-					break
-				}
-
-			case *tg.PeerChannel:
-				if args.Type != DialogTypeAll && args.Type != DialogTypeChannel {
-					continue
-				}
-
-				for _, channelItem := range dialogs.Chats {
-					channel, ok := channelItem.(*tg.Channel)
-					if !ok || channel.ID != peer.ChannelID {
-						continue
-					}
-
-					info.ID = channel.ID
-					info.Type = "channel"
-					info.Title = channel.Title
-					info.IsVerified = channel.Verified
-
-					result = append(result, info)
-
-					break
-				}
-			}
-		}
+		//jsonData, _ := json.Marshal(dc)
+		//log.Info().RawJSON("dialogs", cleanJSON(jsonData)).Msg("dialogs")
 
 		return nil
 	}); err != nil {
 		return nil, errors.Wrap(err, "failed to get dialogs")
 	}
 
-	sort.Slice(result, func(i, j int) bool {
-		return result[i].LastMessageID > result[j].LastMessageID
-	})
-
-	if len(result) > args.Limit {
-		result = result[:args.Limit]
+	d, err := newDialogs(dc)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get dialogs")
 	}
 
-	jsonData, err := json.Marshal(result)
+	info := d.Info()
+
+	sort.Slice(result, func(i, j int) bool {
+		return info[i].LastMessage.ts > result[j].LastMessage.ts
+	})
+
+	jsonData, err := json.Marshal(info)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal response")
 	}
 
-	cleanedData := cleanJSON(jsonData)
-	return mcp.NewToolResponse(mcp.NewTextContent(string(cleanedData))), nil
+	return mcp.NewToolResponse(mcp.NewTextContent(string(jsonData))), nil
+}
+
+type dialogs struct {
+	tg.MessagesDialogs
+
+	// chat id key
+	messages map[int64]*tg.Message
+	users    map[int64]*tg.User
+	//dialogs  map[string]*tg.Dialog
+	chats    map[int64]*tg.Chat
+	channels map[int64]*tg.Channel
+}
+
+func newDialogs(rawD tg.MessagesDialogsClass) (*dialogs, error) {
+	var d dialogs
+	switch dT := rawD.(type) {
+	case *tg.MessagesDialogs:
+		d = dialogs{MessagesDialogs: *dT}
+	case *tg.MessagesDialogsSlice:
+		d = dialogs{MessagesDialogs: tg.MessagesDialogs{
+			Dialogs:  dT.Dialogs,
+			Messages: dT.Messages,
+			Chats:    dT.Chats,
+			Users:    dT.Users,
+		}}
+	case *tg.MessagesDialogsNotModified:
+	default:
+	}
+
+	d.messages = make(map[int64]*tg.Message)
+	for _, m := range d.Messages {
+		switch mT := m.(type) {
+		case *tg.Message:
+			d.messages[getPeerID(mT.PeerID)] = mT
+		case *tg.MessageService, *tg.MessageEmpty:
+		default:
+		}
+	}
+	delete(d.messages, 0)
+
+	d.users = make(map[int64]*tg.User)
+	for _, uc := range d.Users {
+		u, ok := uc.(*tg.User)
+		if !ok {
+			log.Debug().Msgf("newDialogs(%+v): invalid message user", uc)
+			continue
+		}
+
+		d.users[u.GetID()] = u
+	}
+
+	d.chats = make(map[int64]*tg.Chat)
+	d.channels = make(map[int64]*tg.Channel)
+	for _, c := range d.Chats {
+		switch cT := c.(type) {
+		case *tg.Chat:
+			d.chats[cT.ID] = cT
+		case *tg.Channel:
+			d.channels[cT.ID] = cT
+		case *tg.ChatForbidden, *tg.ChannelForbidden, *tg.ChatEmpty:
+		default:
+		}
+	}
+
+	return &d, nil
+}
+
+func (d *dialogs) Info() []DialogInfo {
+	ds := make([]DialogInfo, 0, len(d.Dialogs))
+
+	for _, dItem := range d.Dialogs {
+		info, err := d.processDialog(dItem)
+		if err != nil {
+			log.Debug().Err(err).Str("dialog", dItem.String()).Msg("failed process dialog")
+			continue
+		}
+
+		if info.Name == "" {
+			continue
+		}
+
+		ds = append(ds, info)
+	}
+
+	return ds
+}
+
+func (d *dialogs) processDialog(rawD tg.DialogClass) (DialogInfo, error) {
+	dialogItem, ok := rawD.(*tg.Dialog)
+	if !ok {
+		return DialogInfo{}, errors.Errorf("newDialogs(%T): invalid dialog type", rawD)
+	}
+
+	var info DialogInfo
+
+	if msg, ok := d.messages[getPeerID(dialogItem.Peer)]; ok {
+		var who string
+		if msg.FromID != nil {
+			name, _, err := d.getNameID(msg.FromID)
+			if err != nil {
+				return DialogInfo{}, errors.Wrap(err, "failed to get dialog name")
+			}
+			who = name
+		}
+
+		// Limit message to 20 words
+		text := msg.Message
+		words := strings.Fields(text)
+		if len(words) > 20 {
+			text = strings.Join(words[:20], " ") + "..."
+		}
+
+		info.LastMessage = &MessageInfo{
+			Who:      who,
+			When:     time.Unix(int64(msg.Date), 0).Format(time.DateTime),
+			ts:       msg.Date,
+			Text:     text,
+			IsUnread: dialogItem.UnreadCount > 0,
+		}
+
+	}
+
+	if dialogItem.Peer == nil {
+		return DialogInfo{}, fmt.Errorf("no peer: %s", dialogItem.String())
+	}
+
+	var err error
+	info.Name, info.ID, err = d.getNameID(dialogItem.Peer)
+	if err != nil {
+		return DialogInfo{}, err
+	}
+
+	info.Type = string(d.getType(dialogItem))
+
+	return info, nil
+}
+
+func (d *dialogs) getNameID(pC tg.PeerClass) (string, int64, error) {
+	var name string
+	var id int64
+	switch p := pC.(type) {
+	case *tg.PeerUser:
+		id = p.GetUserID()
+		u, ok := d.users[id]
+		if !ok {
+			return "", 0, errors.Errorf("peerid(%d): invalid message user", id)
+		}
+		name = getName(u)
+	case *tg.PeerChannel:
+		id = p.GetChannelID()
+		channel, ok := d.channels[id]
+		if !ok {
+			return "", 0, errors.Errorf("peerid(%d): invalid message channel", id)
+		}
+
+		name = getName(channel)
+	case *tg.PeerChat:
+		id = p.GetChatID()
+		chat, ok := d.chats[id]
+		if !ok {
+			return "", 0, errors.Errorf("peerid(%d): invalid message chat", id)
+		}
+
+		name = getName(chat)
+	default:
+		return "", 0, fmt.Errorf("chose author(%T): invalid dialog peer", p)
+	}
+
+	return name, id, nil
+}
+
+func (d *dialogs) getType(rawD *tg.Dialog) DialogType {
+	switch v := rawD.Peer.(type) {
+	case *tg.PeerChannel:
+		return DialogTypeChannel
+	case *tg.PeerChat:
+		return DialogTypeChat
+	case *tg.PeerUser:
+		u, ok := d.users[getPeerID(rawD.Peer)]
+		if !ok {
+			log.Debug().Msgf("getType(%+v): user not found", v)
+			return DialogTypeUser
+		}
+
+		if u.Bot {
+			return DialogTypeBot
+		}
+
+		return DialogTypeUser
+	default:
+		log.Debug().Msgf("getType(%+v): unknown dialog type", v)
+		return DialogTypeUnknown
+	}
+}
+
+func getPeerID(p tg.PeerClass) int64 {
+	if p == nil {
+		return 0
+	}
+
+	switch v := p.(type) {
+	case *tg.PeerChannel:
+		return v.ChannelID
+	case *tg.PeerChat:
+		return v.ChatID
+	case *tg.PeerUser:
+		return v.UserID
+	default:
+		return 0
+	}
+
 }

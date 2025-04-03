@@ -41,34 +41,24 @@ func serve(ctx context.Context, cmd *cli.Command) error {
 
 		log.Info().RawJSON("answer", data).Msg("Check GetMe: OK")
 
-		answer, err = client.GetDialogs(tg.DialogsArguments{WithLastMessages: true})
+		answer, err = client.GetDialogs(tg.DialogsArguments{})
 		if err != nil {
 			return fmt.Errorf("get dialogs: %w", err)
 		}
 
-		data, err = json.MarshalIndent(answer, "", "  ")
-		if err != nil {
-			return fmt.Errorf("marshal: %w", err)
-		}
-
-		log.Info().RawJSON("answer", data).Msg("Check GetDialogs: OK")
+		log.Info().RawJSON("answer", []byte(answer.Content[0].TextContent.Text)).Msg("Check GetDialogs: OK")
 
 		return nil
 	}
 
-	err = server.RegisterTool("tg_me", "Get current account info", client.GetMe)
+	err = server.RegisterTool("tg_me", "Get current telegram account info", client.GetMe)
 	if err != nil {
 		return fmt.Errorf("register tool: %w", err)
 	}
 
-	err = server.RegisterTool("tg_dialogs", "Get list of dialogs (chats, channels, groups)", client.GetDialogs)
+	err = server.RegisterTool("tg_dialogs", "Get list of telegram dialogs (chats, channels, groups)", client.GetDialogs)
 	if err != nil {
 		return fmt.Errorf("register dialogs tool: %w", err)
-	}
-
-	err = server.RegisterResource("telegram://chats", "tg_chats", "List of telegram chats", "application/json", sampleResource)
-	if err != nil {
-		return fmt.Errorf("register chats resource: %w", err)
 	}
 
 	if err := server.Serve(); err != nil {

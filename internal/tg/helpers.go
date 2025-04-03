@@ -7,14 +7,26 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func getUserName(user *tg.User) string {
-	if username, ok := user.GetUsername(); ok && username != "" {
-		return "@" + username
-	}
+func getName(source any) string {
+	var name string
+	switch u := source.(type) {
+	case *tg.User:
+		name = u.FirstName
+		if u.LastName != "" {
+			name += " " + u.LastName
+		}
 
-	name := user.FirstName
-	if user.LastName != "" {
-		name += " " + user.LastName
+		if username, ok := u.GetUsername(); ok && username != "" {
+			name += " @" + username + ""
+		}
+	case *tg.Chat:
+		name = u.Title
+	case *tg.Channel:
+		name = u.Title
+
+		if username, ok := u.GetUsername(); ok && username != "" {
+			name += " @" + username + ""
+		}
 	}
 
 	return name
