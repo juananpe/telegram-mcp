@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sort"
 	"strings"
 	"time"
 
@@ -30,34 +29,50 @@ const (
 
 // nolint:lll
 type DialogsArguments struct {
-	//WithLastMessages bool `json:"with_last_messages,omitempty" jsonschema:"description=Include last messages in response"`
+	Offset string `json:"offset,omitempty" jsonschema:"description=Offset for continuation"`
 }
 
 type MessageInfo struct {
-	Who      string `json:"who"`
+	Who      string `json:"who,omitempty"`
 	When     string `json:"when"`
-	Text     string `json:"text"`
+	Text     string `json:"text,omitempty"`
 	IsUnread bool   `json:"is_unread,omitempty"`
 	ts       int
 }
 
 type DialogInfo struct {
-	ID          int64        `json:"id"`
+	Name        string       `json:"name,omitempty"`
 	Type        string       `json:"type"`
-	Name        string       `json:"name"`
+	Title       string       `json:"title"`
 	LastMessage *MessageInfo `json:"last_message,omitempty"`
+	Empty       bool         `json:"empty,omitempty"`
+}
+
+type DialogsResponse struct {
+	Dialogs []DialogInfo  `json:"dialogs"`
+	Offset  DialogsOffset `json:"offset"`
 }
 
 // GetDialogs returns a list of dialogs (chats, channels, groups)
 func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
-	var result []DialogInfo
+	var offset DialogsOffset
+	if args.Offset != "" {
+		if err := offset.UnmarshalJSON([]byte(args.Offset)); err != nil {
+			return nil, errors.Wrap(err, "failed to unmarshal offset")
+		}
+	}
+	if offset.Peer == nil {
+		offset.Peer = &tg.InputPeerEmpty{}
+	}
 
 	var dc tg.MessagesDialogsClass
 	client := c.T()
 	if err := client.Run(context.Background(), func(ctx context.Context) (err error) {
 		api := client.API()
 		dc, err = api.MessagesGetDialogs(ctx, &tg.MessagesGetDialogsRequest{
-			OffsetPeer: &tg.InputPeerEmpty{},
+			OffsetPeer: offset.Peer,
+			OffsetID:   offset.MsgID,
+			OffsetDate: offset.Date,
 		})
 		if err != nil {
 			return fmt.Errorf("failed to get dialogs: %w", err)
@@ -77,13 +92,12 @@ func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
 		return nil, errors.Wrap(err, "failed to get dialogs")
 	}
 
-	info := d.Info()
+	rsp := DialogsResponse{
+		Dialogs: d.Info(),
+		Offset:  d.Offset(),
+	}
 
-	sort.Slice(result, func(i, j int) bool {
-		return info[i].LastMessage.ts > result[j].LastMessage.ts
-	})
-
-	jsonData, err := json.Marshal(info)
+	jsonData, err := json.Marshal(rsp)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal response")
 	}
@@ -166,7 +180,7 @@ func (d *dialogs) Info() []DialogInfo {
 			continue
 		}
 
-		if info.Name == "" {
+		if info.Title == "" {
 			continue
 		}
 
@@ -174,6 +188,31 @@ func (d *dialogs) Info() []DialogInfo {
 	}
 
 	return ds
+}
+
+func (d *dialogs) Offset() DialogsOffset {
+	for i := len(d.Dialogs) - 1; i >= 0; i-- {
+		dialogItem, ok := d.Dialogs[i].(*tg.Dialog)
+		if !ok {
+			continue
+		}
+		if dialogItem.Peer == nil {
+			continue
+		}
+
+		msg, ok := d.messages[getPeerID(dialogItem.Peer)]
+		if !ok {
+			continue
+		}
+
+		return DialogsOffset{
+			MsgID: msg.ID,
+			Date:  msg.Date,
+			Peer:  getInputPeerID(dialogItem.Peer),
+		}
+	}
+
+	return DialogsOffset{}
 }
 
 func (d *dialogs) processDialog(rawD tg.DialogClass) (DialogInfo, error) {
@@ -216,48 +255,51 @@ func (d *dialogs) processDialog(rawD tg.DialogClass) (DialogInfo, error) {
 	}
 
 	var err error
-	info.Name, info.ID, err = d.getNameID(dialogItem.Peer)
+	info.Title, info.Name, err = d.getNameID(dialogItem.Peer)
 	if err != nil {
 		return DialogInfo{}, err
 	}
 
 	info.Type = string(d.getType(dialogItem))
 
+	if info.LastMessage == nil {
+		info.Empty = true
+	}
+
 	return info, nil
 }
 
-func (d *dialogs) getNameID(pC tg.PeerClass) (string, int64, error) {
-	var name string
-	var id int64
+func (d *dialogs) getNameID(pC tg.PeerClass) (string, string, error) {
+	var name, username string
 	switch p := pC.(type) {
 	case *tg.PeerUser:
-		id = p.GetUserID()
-		u, ok := d.users[id]
+		u, ok := d.users[p.GetUserID()]
 		if !ok {
-			return "", 0, errors.Errorf("peerid(%d): invalid message user", id)
+			return "", "", errors.Errorf("peerid(%d): invalid message user", p.GetUserID())
 		}
-		name = getName(u)
+		name = getTitle(u)
+		username = getUsername(u)
 	case *tg.PeerChannel:
-		id = p.GetChannelID()
-		channel, ok := d.channels[id]
+		channel, ok := d.channels[p.GetChannelID()]
 		if !ok {
-			return "", 0, errors.Errorf("peerid(%d): invalid message channel", id)
+			return "", "", errors.Errorf("peerid(%d): invalid message channel", p.GetChannelID())
 		}
 
-		name = getName(channel)
+		name = getTitle(channel)
+		username = getUsername(channel)
 	case *tg.PeerChat:
-		id = p.GetChatID()
-		chat, ok := d.chats[id]
+		chat, ok := d.chats[p.GetChatID()]
 		if !ok {
-			return "", 0, errors.Errorf("peerid(%d): invalid message chat", id)
+			return "", "", errors.Errorf("peerid(%d): invalid message chat", p.GetChatID())
 		}
 
-		name = getName(chat)
+		name = getTitle(chat)
+		username = getUsername(chat)
 	default:
-		return "", 0, fmt.Errorf("chose author(%T): invalid dialog peer", p)
+		return "", "", fmt.Errorf("chose author(%T): invalid dialog peer", p)
 	}
 
-	return name, id, nil
+	return name, username, nil
 }
 
 func (d *dialogs) getType(rawD *tg.Dialog) DialogType {

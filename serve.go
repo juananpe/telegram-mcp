@@ -41,12 +41,19 @@ func serve(ctx context.Context, cmd *cli.Command) error {
 
 		log.Info().RawJSON("answer", data).Msg("Check GetMe: OK")
 
-		answer, err = client.GetDialogs(tg.DialogsArguments{})
+		answer, err = client.GetDialogs(tg.DialogsArguments{Offset: ""})
 		if err != nil {
 			return fmt.Errorf("get dialogs: %w", err)
 		}
 
 		log.Info().RawJSON("answer", []byte(answer.Content[0].TextContent.Text)).Msg("Check GetDialogs: OK")
+
+		answer, err = client.GetHistory(tg.HistoryArguments{Name: "lalal", Offset: 5574})
+		if err != nil {
+			return fmt.Errorf("get histore: %w", err)
+		}
+
+		log.Info().RawJSON("answer", []byte(answer.Content[0].TextContent.Text)).Msg("Check GetHistory: OK")
 
 		return nil
 	}
@@ -56,7 +63,12 @@ func serve(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("register tool: %w", err)
 	}
 
-	err = server.RegisterTool("tg_dialogs", "Get list of telegram dialogs (chats, channels, groups)", client.GetDialogs)
+	err = server.RegisterTool("tg_dialogs", "Get list of telegram dialogs (chats, channels, users)", client.GetDialogs)
+	if err != nil {
+		return fmt.Errorf("register dialogs tool: %w", err)
+	}
+
+	err = server.RegisterTool("tg_dialog", "Get messages of telegram dialog (channel, user)", client.GetHistory)
 	if err != nil {
 		return fmt.Errorf("register dialogs tool: %w", err)
 	}

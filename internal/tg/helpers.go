@@ -2,12 +2,13 @@ package tg
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/gotd/td/tg"
 	"github.com/tidwall/gjson"
 )
 
-func getName(source any) string {
+func getTitle(source any) string {
 	var name string
 	switch u := source.(type) {
 	case *tg.User:
@@ -16,20 +17,27 @@ func getName(source any) string {
 			name += " " + u.LastName
 		}
 
-		if username, ok := u.GetUsername(); ok && username != "" {
-			name += " @" + username + ""
-		}
 	case *tg.Chat:
 		name = u.Title
 	case *tg.Channel:
 		name = u.Title
-
-		if username, ok := u.GetUsername(); ok && username != "" {
-			name += " @" + username + ""
-		}
 	}
 
 	return name
+}
+
+func getUsername(source any) string {
+	var username string
+	switch u := source.(type) {
+	case *tg.User:
+		username = u.Username
+	case *tg.Chat:
+		username = fmt.Sprintf("chat(%d)", u.ID)
+	case *tg.Channel:
+		username = u.Username
+	}
+
+	return username
 }
 
 // cleanJSON removes empty/default fields from JSON
