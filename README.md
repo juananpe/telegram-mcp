@@ -1,3 +1,6 @@
+![](https://badge.mcpx.dev 'MCP')
+[![License: MIT](https://img.shields.io/badge/license-Apache%202.0-green?style=flat-square)](https://opensource.org/license/mit)
+
 # Telegram MCP server
 
 The server is a bridge between the Telegram API and the AI assistants and is based on the [Model Context Protocol](https://modelcontextprotocol.io).
