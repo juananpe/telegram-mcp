@@ -1,5 +1,5 @@
 ![](https://badge.mcpx.dev 'MCP')
-[![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](https://opensource.org/license/mit)
+[![License](https://img.shields.io/:license-mit-blue.svg)](https://badges.mit-license.org)
 
 # Telegram MCP server
 
