@@ -41,7 +41,7 @@ func serve(ctx context.Context, cmd *cli.Command) error {
 
 		log.Info().RawJSON("answer", data).Msg("Check GetMe: OK")
 
-		answer, err = client.GetDialogs(tg.DialogsArguments{Offset: ""})
+		answer, err = client.GetDialogs(tg.DialogsArguments{Offset: "", OnlyUnread: true})
 		if err != nil {
 			return fmt.Errorf("get dialogs: %w", err)
 		}

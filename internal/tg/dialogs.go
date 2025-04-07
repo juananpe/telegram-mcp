@@ -29,7 +29,8 @@ const (
 
 // nolint:lll
 type DialogsArguments struct {
-	Offset string `json:"offset,omitempty" jsonschema:"description=Offset for continuation"`
+	Offset     string `json:"offset,omitempty" jsonschema:"description=Offset for continuation"`
+	OnlyUnread bool   `json:"only_unread,omitempty" jsonschema:"description=Include only dialogs with unread mark"`
 }
 
 type MessageInfo struct {
@@ -87,7 +88,7 @@ func (c *Client) GetDialogs(args DialogsArguments) (*mcp.ToolResponse, error) {
 		return nil, errors.Wrap(err, "failed to get dialogs")
 	}
 
-	d, err := newDialogs(dc)
+	d, err := newDialogs(dc, args.OnlyUnread)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get dialogs")
 	}
@@ -114,9 +115,12 @@ type dialogs struct {
 	//dialogs  map[string]*tg.Dialog
 	chats    map[int64]*tg.Chat
 	channels map[int64]*tg.Channel
+
+	//opts
+	onlyUnread bool
 }
 
-func newDialogs(rawD tg.MessagesDialogsClass) (*dialogs, error) {
+func newDialogs(rawD tg.MessagesDialogsClass, onlyUnread bool) (*dialogs, error) {
 	var d dialogs
 	switch dT := rawD.(type) {
 	case *tg.MessagesDialogs:
@@ -167,6 +171,8 @@ func newDialogs(rawD tg.MessagesDialogsClass) (*dialogs, error) {
 		}
 	}
 
+	d.onlyUnread = onlyUnread
+
 	return &d, nil
 }
 
@@ -174,7 +180,16 @@ func (d *dialogs) Info() []DialogInfo {
 	ds := make([]DialogInfo, 0, len(d.Dialogs))
 
 	for _, dItem := range d.Dialogs {
-		info, err := d.processDialog(dItem)
+		dialogItem, ok := dItem.(*tg.Dialog)
+		if !ok {
+			continue
+		}
+
+		if d.onlyUnread && dialogItem.UnreadCount == 0 {
+			continue
+		}
+
+		info, err := d.processDialog(dialogItem)
 		if err != nil {
 			log.Debug().Err(err).Str("dialog", dItem.String()).Msg("failed process dialog")
 			continue
@@ -215,12 +230,7 @@ func (d *dialogs) Offset() DialogsOffset {
 	return DialogsOffset{}
 }
 
-func (d *dialogs) processDialog(rawD tg.DialogClass) (DialogInfo, error) {
-	dialogItem, ok := rawD.(*tg.Dialog)
-	if !ok {
-		return DialogInfo{}, errors.Errorf("newDialogs(%T): invalid dialog type", rawD)
-	}
-
+func (d *dialogs) processDialog(dialogItem *tg.Dialog) (DialogInfo, error) {
 	var info DialogInfo
 
 	if msg, ok := d.messages[getPeerID(dialogItem.Peer)]; ok {
