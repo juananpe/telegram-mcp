@@ -46,24 +46,19 @@ The Model Context Protocol (MCP) is a system that lets AI apps, like Claude Desk
 
 > **Note:** The commands below install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
 
+First, download the archive for your architecture:
+
 ```bash
-# Intel Mac (x86_64)
-# Download the archive
+# For Intel Mac (x86_64)
 curl -L -o telegram-mcp.tar.gz https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Darwin_x86_64.tar.gz
 
-# Extract the binary
-sudo tar xzf telegram-mcp.tar.gz -C /usr/local/bin
-
-# Make it executable
-sudo chmod +x /usr/local/bin/telegram-mcp
-
-# Clean up
-rm telegram-mcp.tar.gz
-
-# Apple Silicon (M1/M2)
-# Download the archive
+# For Apple Silicon (M1/M2)
 curl -L -o telegram-mcp.tar.gz https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Darwin_arm64.tar.gz
+```
 
+Then install the binary:
+
+```bash
 # Extract the binary
 sudo tar xzf telegram-mcp.tar.gz -C /usr/local/bin
 
@@ -78,24 +73,19 @@ rm telegram-mcp.tar.gz
 
 > **Note:** The commands below install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
 
+First, download the archive for your architecture:
+
 ```bash
-# x86_64 (64-bit)
-# Download the archive
+# For x86_64 (64-bit)
 curl -L -o telegram-mcp.tar.gz https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Linux_x86_64.tar.gz
 
-# Extract the binary
-sudo tar xzf telegram-mcp.tar.gz -C /usr/local/bin
-
-# Make it executable
-sudo chmod +x /usr/local/bin/telegram-mcp
-
-# Clean up
-rm telegram-mcp.tar.gz
-
-# ARM64
-# Download the archive
+# For ARM64
 curl -L -o telegram-mcp.tar.gz https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Linux_arm64.tar.gz
+```
 
+Then install the binary:
+
+```bash
 # Extract the binary
 sudo tar xzf telegram-mcp.tar.gz -C /usr/local/bin
 
