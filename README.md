@@ -42,29 +42,68 @@ The Model Context Protocol (MCP) is a system that lets AI apps, like Claude Desk
 
 ### From Releases
 
-
 #### macOS
 
-> **Note:** The command above install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
+> **Note:** The commands below install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
 
 ```bash
 # Intel Mac (x86_64)
-curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Darwin_x86_64.tar.gz | tar xz -C /usr/local/bin
+# Download the archive
+curl -L -o telegram-mcp.tar.gz https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Darwin_x86_64.tar.gz
+
+# Extract the binary
+sudo tar xzf telegram-mcp.tar.gz -C /usr/local/bin
+
+# Make it executable
+sudo chmod +x /usr/local/bin/telegram-mcp
+
+# Clean up
+rm telegram-mcp.tar.gz
 
 # Apple Silicon (M1/M2)
-curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Darwin_arm64.tar.gz | tar xz -C /usr/local/bin
+# Download the archive
+curl -L -o telegram-mcp.tar.gz https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Darwin_arm64.tar.gz
+
+# Extract the binary
+sudo tar xzf telegram-mcp.tar.gz -C /usr/local/bin
+
+# Make it executable
+sudo chmod +x /usr/local/bin/telegram-mcp
+
+# Clean up
+rm telegram-mcp.tar.gz
 ```
 
 #### Linux
 
-> **Note:** The commands install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
+> **Note:** The commands below install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
 
 ```bash
 # x86_64 (64-bit)
-curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin
+# Download the archive
+curl -L -o telegram-mcp.tar.gz https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Linux_x86_64.tar.gz
+
+# Extract the binary
+sudo tar xzf telegram-mcp.tar.gz -C /usr/local/bin
+
+# Make it executable
+sudo chmod +x /usr/local/bin/telegram-mcp
+
+# Clean up
+rm telegram-mcp.tar.gz
 
 # ARM64
-curl -L https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Linux_arm64.tar.gz | tar xz -C /usr/local/bin
+# Download the archive
+curl -L -o telegram-mcp.tar.gz https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Linux_arm64.tar.gz
+
+# Extract the binary
+sudo tar xzf telegram-mcp.tar.gz -C /usr/local/bin
+
+# Make it executable
+sudo chmod +x /usr/local/bin/telegram-mcp
+
+# Clean up
+rm telegram-mcp.tar.gz
 ```
 
 #### Windows

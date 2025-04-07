@@ -24,10 +24,18 @@ archives:
     format_overrides:
       - goos: windows
         formats: zip
+    files: []
 
 changelog:
   use: github
   sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - typo
+      - readme
+    include:
+      - "^feat:"
 
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
