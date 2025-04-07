@@ -34,7 +34,7 @@ The Model Context Protocol (MCP) is a system that lets AI apps, like Claude Desk
 - [x] Get the list of dialogs (chats, channels, groups)
 - [x] Get the list of messages in the given dialog
 - [x] Draft a message
-- [ ] Mark chanel as read
+- [x] Mark dialog as read
 - [ ] Retrieve messages by date and time
 - [ ] Get the list of contacts
 
