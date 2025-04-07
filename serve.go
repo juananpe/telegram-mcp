@@ -48,7 +48,7 @@ func serve(ctx context.Context, cmd *cli.Command) error {
 
 		log.Info().RawJSON("answer", []byte(answer.Content[0].TextContent.Text)).Msg("Check GetDialogs: OK")
 
-		answer, err = client.GetHistory(tg.HistoryArguments{Name: "lalal", Offset: 5574})
+		answer, err = client.GetHistory(tg.HistoryArguments{Name: os.Getenv("TG_TEST_USERNAME")})
 		if err != nil {
 			return fmt.Errorf("get histore: %w", err)
 		}

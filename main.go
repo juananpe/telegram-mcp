@@ -77,6 +77,16 @@ func main() {
 						Required: true,
 						Aliases:  []string{"p"},
 					},
+					&cli.StringFlag{
+						Name:        "password",
+						Usage:       "Password for 2FA if exists",
+						HideDefault: true,
+					},
+					&cli.BoolFlag{
+						Name:        "new",
+						Usage:       "Remove old session and create new one",
+						HideDefault: true,
+					},
 				},
 				Action: authCommand,
 			},

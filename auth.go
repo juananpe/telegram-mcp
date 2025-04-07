@@ -13,6 +13,8 @@ import (
 
 func authCommand(_ context.Context, cmd *cli.Command) error {
 	phone := cmd.String("phone")
+	newSession := cmd.Bool("new")
+	pass := cmd.String("password")
 	appID := cmd.Root().Int("app-id")
 	apiHash := cmd.Root().String("api-hash")
 	sessionPath := cmd.Root().String("session")
@@ -24,7 +26,7 @@ func authCommand(_ context.Context, cmd *cli.Command) error {
 		Int64("app-id", appID).
 		Msg("Authenticate with Telegram")
 
-	err := tg.Auth(phone, appID, apiHash, sessionPath)
+	err := tg.Auth(phone, appID, apiHash, sessionPath, pass, newSession)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to authenticate with Telegram")
 	}

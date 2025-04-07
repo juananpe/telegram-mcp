@@ -87,14 +87,19 @@ Before you can use the server, you need to connect to the Telegram API.
 
 1. Get the API ID and hash from [Telegram API](https://my.telegram.org/auth)
 2. Run the following command:
+   > __Note:__
+   > If you have 2FA enabled: add --password <2fa_password>
+
+   >  __Note:__
+   > If you want to override existing session: add --new
 
    ```bash
    telegram-mcp auth --app-id <your-api-id> --api-hash <your-api-hash> --phone <your-phone-number>
    ```
 
-   Enter the code you received from Telegram to connect to the API.
+   📩 Enter the code you received from Telegram to connect to the API.
 
-   The password may be required if you have two-factor authentication enabled.
+3. Done!
 
 ### Client Configuration
 
