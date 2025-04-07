@@ -1,6 +1,6 @@
 ![](https://badge.mcpx.dev 'MCP')
 [![License](https://img.shields.io/:license-mit-blue.svg)](https://badges.mit-license.org)
-![](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fchaindead%2Ftelegram-mcp&label=Repository%20Visits&countColor=%230c7ebe&style=flat&labelStyle=none)
+![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2Fchaindead%2Ftelegram-mcp&countColor=%23263759&style=flat)
 
 # Telegram MCP server
 
