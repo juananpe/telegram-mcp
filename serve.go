@@ -55,6 +55,13 @@ func serve(ctx context.Context, cmd *cli.Command) error {
 
 		log.Info().RawJSON("answer", []byte(answer.Content[0].TextContent.Text)).Msg("Check GetHistory: OK")
 
+		answer, err = client.SendDraft(tg.DraftArguments{Name: os.Getenv("TG_TEST_USERNAME"), Text: "test draft"})
+		if err != nil {
+			return fmt.Errorf("send draft: %w", err)
+		}
+
+		log.Info().RawJSON("answer", []byte(answer.Content[0].TextContent.Text)).Msg("Check SendDraft: OK")
+
 		return nil
 	}
 
@@ -69,6 +76,11 @@ func serve(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	err = server.RegisterTool("tg_dialog", "Get messages of telegram dialog (channel, user)", client.GetHistory)
+	if err != nil {
+		return fmt.Errorf("register dialogs tool: %w", err)
+	}
+
+	err = server.RegisterTool("tg_send", "Send draft message to dialog (channel, user)", client.SendDraft)
 	if err != nil {
 		return fmt.Errorf("register dialogs tool: %w", err)
 	}
