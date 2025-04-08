@@ -23,7 +23,7 @@ The server is a bridge between the Telegram API and the AI assistants and is bas
     - [Windows](#windows)
   - [From Source](#from-source)
 - [Configuration](#configuration)
-  - [Telegram API Configuration](#telegram-api-configuration)
+  - [Authorization](#authorization)
   - [Client Configuration](#client-configuration)
 - [Star History](#star-history)
 
@@ -62,6 +62,31 @@ You can run the latest version directly using npx (supports macOS, Linux, and Wi
 ```bash
 npx -y @chaindead/telegram-mcp
 ```
+
+When using NPX, modify the standard commands and configuration as follows:
+
+- [Authentication command](#authorization) becomes:
+```bash
+npx -y @chaindead/telegram-mcp auth ...
+```
+
+- [MCP server configuration](#client-configuration) becomes:
+```json
+{
+  "mcpServers": {
+    "telegram": {
+      "command": "npx",
+      "args": ["-y", "@chaindead/telegram-mcp"],
+      "env": {
+        "TG_APP_ID": "<your-api-id>",
+        "TG_API_HASH": "<your-api-hash>"
+      }
+    }
+  }
+}
+```
+
+For complete setup instructions, see [Authorization](#authorization) and [Client Configuration](#client-configuration).
 
 ### From Releases
 
@@ -148,7 +173,7 @@ go install github.com/chaindead/telegram-mcp@latest
 
 ## Configuration
 
-### Telegram API Configuration
+### Authorization
 
 Before you can use the server, you need to connect to the Telegram API.
 
