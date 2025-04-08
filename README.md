@@ -70,7 +70,7 @@ When using NPX, modify the standard commands and configuration as follows:
 npx -y @chaindead/telegram-mcp auth ...
 ```
 
-- [MCP server configuration](#client-configuration) becomes:
+- [Claude MCP server configuration](#client-configuration) becomes:
 ```json
 {
   "mcpServers": {
