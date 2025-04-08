@@ -49,7 +49,6 @@ brews:
     repository:
       owner: chaindead
       name: homebrew-tap
-      token: "{{ .Env.GITHUB_PERSONAL_TOKEN }}"
     install: |
       bin.install "telegram-mcp"
     test: |
