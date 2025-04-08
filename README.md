@@ -64,9 +64,9 @@ npx -y @chaindead/telegram-mcp
 ```
 
 ### From Releases
-<details>
 
-#### macOS
+<details>
+<summary><h4>macOS</h4></summary>
 
 > **Note:** The commands below install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
 
@@ -92,8 +92,10 @@ sudo chmod +x /usr/local/bin/telegram-mcp
 # Clean up
 rm telegram-mcp.tar.gz
 ```
+</details>
 
-#### Linux
+<details>
+<summary><h4>Linux</h4></summary>
 
 > **Note:** The commands below install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
 
@@ -119,14 +121,16 @@ sudo chmod +x /usr/local/bin/telegram-mcp
 # Clean up
 rm telegram-mcp.tar.gz
 ```
+</details>
 
-#### Windows
+<details>
+<summary><h4>Windows</h4></summary>
+
 1. Download the latest release for your architecture:
    - [Windows x64](https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Windows_x86_64.zip)
    - [Windows ARM64](https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Windows_arm64.zip)
 2. Extract the `.zip` file
 3. Add the extracted directory to your PATH or move `telegram-mcp.exe` to a directory in your PATH
-
 </details>
 
 ### From Source
