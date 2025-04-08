@@ -15,6 +15,7 @@ The server is a bridge between the Telegram API and the AI assistants and is bas
 - [What is MCP?](#what-is-mcp)
 - [What does this server do?](#what-does-this-server-do)
 - [Installation](#installation)
+  - [Homebrew](#homebrew)
   - [From Releases](#from-releases)
     - [macOS](#macos)
     - [Linux](#linux)
@@ -39,6 +40,18 @@ The Model Context Protocol (MCP) is a system that lets AI apps, like Claude Desk
 - [ ] Get the list of contacts
 
 ## Installation
+
+### Homebrew
+
+You can install a binary release on macOS/Linux using brew:
+
+```bash
+# Install
+brew install chaindead/tap/telegram-mcp
+
+# Update
+brew upgrade chaindead/tap/telegram-mcp
+```
 
 ### From Releases
 
