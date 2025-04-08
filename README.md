@@ -147,7 +147,7 @@ Before you can use the server, you need to connect to the Telegram API.
 
    📩 Enter the code you received from Telegram to connect to the API.
 
-3. Done!
+3. Done! Please give this project a ⭐️ to support its development.
 
 ### Client Configuration
 
