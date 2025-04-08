@@ -18,7 +18,7 @@ The server is a bridge between the Telegram API and the AI assistants and is bas
   - [Homebrew](#homebrew)
   - [NPX](#npx)
   - [From Releases](#from-releases)
-    - [macOS](#macos)
+    - [MacOS](#macos)
     - [Linux](#linux)
     - [Windows](#windows)
   - [From Source](#from-source)
@@ -69,7 +69,6 @@ npx -y @chaindead/telegram-mcp
 
 <details>
 
-
 > **Note:** The commands below install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
 
 First, download the archive for your architecture:
@@ -98,6 +97,7 @@ rm telegram-mcp.tar.gz
 
 #### Linux
 <details>
+
 > **Note:** The commands below install to `/usr/local/bin`. To install elsewhere, replace `/usr/local/bin` with your preferred directory in your PATH.
 
 First, download the archive for your architecture:
