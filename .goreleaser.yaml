@@ -39,4 +39,22 @@ changelog:
 
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
-  algorithm: sha256 
+  algorithm: sha256
+
+brews:
+  - name: telegram-mcp
+    homepage: "https://github.com/chaindead/telegram-mcp"
+    description: "Telegram MCP server for AI assistants"
+    license: "MIT"
+    dependencies:
+      - name: go
+        type: build
+    repository:
+      owner: chaindead
+      name: homebrew-tap
+      token: "{{ .Env.PERSONAL_AUTH_TOKEN }}"
+    install: |
+      bin.install "telegram-mcp"
+    test: |
+      system "#{bin}/telegram-mcp", "--version"
+    
