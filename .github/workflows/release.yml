@@ -33,3 +33,8 @@ jobs:
         uses: evg4b/goreleaser-npm-publisher-action@v1
         with:
           token: ${{ secrets.NPM_AUTH_TOKEN }}
+          prefix: '@chaindead'
+          description: Telegram MCP server with API integration for accessing user data, managing dialogs (chats, channels, groups), retrieving messages, and handling read status.
+          files: |-
+            LICENSE
+            README.md
