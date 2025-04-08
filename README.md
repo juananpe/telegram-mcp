@@ -16,6 +16,7 @@ The server is a bridge between the Telegram API and the AI assistants and is bas
 - [What does this server do?](#what-does-this-server-do)
 - [Installation](#installation)
   - [Homebrew](#homebrew)
+  - [NPX](#npx)
   - [From Releases](#from-releases)
     - [macOS](#macos)
     - [Linux](#linux)
@@ -54,7 +55,16 @@ brew install chaindead/tap/telegram-mcp
 brew upgrade chaindead/tap/telegram-mcp
 ```
 
+### NPX
+
+You can run the latest version directly using npx (supports macOS, Linux, and Windows):
+
+```bash
+npx -y @chaindead/telegram-mcp
+```
+
 ### From Releases
+<details>
 
 #### macOS
 
@@ -116,6 +126,8 @@ rm telegram-mcp.tar.gz
    - [Windows ARM64](https://github.com/chaindead/telegram-mcp/releases/latest/download/telegram-mcp_Windows_arm64.zip)
 2. Extract the `.zip` file
 3. Add the extracted directory to your PATH or move `telegram-mcp.exe` to a directory in your PATH
+
+</details>
 
 ### From Source
 
