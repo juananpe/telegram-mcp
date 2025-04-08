@@ -29,3 +29,8 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_AUTH_TOKEN }}
+      - name: Publish to npm
+        uses: evg4b/goreleaser-npm-publisher-action@v1.0.0
+        with:
+          prefix: '@chaindead'
+          token: ${{ secrets.NPM_AUTH_TOKEN }}
