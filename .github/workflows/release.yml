@@ -34,3 +34,10 @@ jobs:
         with:
           prefix: '@chaindead'
           token: ${{ secrets.NPM_AUTH_TOKEN }}
+          keywords: |-
+            go
+            golang
+            npm
+          files: |-
+            LICENSE
+            README.md
