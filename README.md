@@ -14,6 +14,11 @@ The server is a bridge between the Telegram API and the AI assistants and is bas
 ## Table of Contents
 - [What is MCP?](#what-is-mcp)
 - [What does this server do?](#what-does-this-server-do)
+  - [Capabilities](#capabilities)
+  - [Prompt examples](#prompt-examples)
+    - [Message Management](#message-management)
+    - [Organization](#organization)
+    - [Communication](#communication)
 - [Installation](#installation)
   - [Homebrew](#homebrew)
   - [NPX](#npx)
@@ -33,13 +38,33 @@ The Model Context Protocol (MCP) is a system that lets AI apps, like Claude Desk
 
 ## What does this server do?
 
-- [x] Get current user data
-- [x] Get the list of dialogs (chats, channels, groups)
-- [x] Get the list of messages in the given dialog
-- [x] Draft a message
-- [x] Mark dialog as read
-- [ ] Retrieve messages by date and time
-- [ ] Get the list of contacts
+### Capabilities
+
+- [x] Get current account information (`tool: tg_me`)
+- [x] List dialogs with optional unread filter (`tool: tg_dialogs`)
+- [x] Mark dialog as read (`tool: tg_read`)
+- [x] Retrieve messages from specific dialog (`tool: tg_dialog`)
+- [x] Send draft messages to any dialog (`tool: tg_send`)
+
+### Prompt examples
+
+Here are some example prompts you can use with AI assistants:
+
+#### Message Management
+- "Check for any unread important messages in my Telegram"
+- "Summarize all my unread Telegram messages"
+- "Read and analyze my unread messages, prepare draft responses where needed"
+- "Check non-critical unread messages and give me a brief overview"
+
+#### Organization
+- "Analyze my Telegram dialogs and suggest a folder structure"
+- "Help me categorize my Telegram chats by importance"
+- "Find all work-related conversations and suggest how to organize them"
+
+#### Communication
+- "Monitor specific chat for updates about [topic]"
+- "Draft a polite response to the last message in [chat]"
+- "Check if there are any unanswered questions in my chats"
 
 ## Installation
 
