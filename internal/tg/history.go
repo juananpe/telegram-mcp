@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gotd/td/telegram/message"
@@ -28,10 +29,9 @@ func (c *Client) GetHistory(args HistoryArguments) (*mcp.ToolResponse, error) {
 	if err := client.Run(context.Background(), func(ctx context.Context) (err error) {
 		api := client.API()
 
-		sender := message.NewSender(api)
-		inputPeer, err := sender.Resolve(args.Name).AsInputPeer(ctx)
+		inputPeer, err := getInputPeerFromName(ctx, api, args.Name)
 		if err != nil {
-			return fmt.Errorf("failed to resolve name: %w", err)
+			return fmt.Errorf("get inputPeer from name: %w", err)
 		}
 
 		messagesClass, err = api.MessagesGetHistory(ctx, &tg.MessagesGetHistoryRequest{
@@ -67,6 +67,37 @@ func (c *Client) GetHistory(args HistoryArguments) (*mcp.ToolResponse, error) {
 	}
 
 	return mcp.NewToolResponse(mcp.NewTextContent(string(jsonData))), nil
+}
+
+func getInputPeerFromName(ctx context.Context, api *tg.Client, name string) (tg.InputPeerClass, error) {
+	isCustom := strings.Contains(name, "[") && strings.Contains(name, "]")
+
+	switch {
+	case strings.HasPrefix(name, "chn") && isCustom:
+		var channelPeer tg.InputPeerChannel
+		_, err := fmt.Sscanf(name, "chn[%d:%d]", &channelPeer.ChannelID, &channelPeer.AccessHash)
+		if err != nil {
+			return nil, errors.Wrapf(err, "scan channel peer(%q)", name)
+		}
+
+		return &channelPeer, nil
+	case strings.HasPrefix(name, "cht") && isCustom:
+		var chatPeer tg.InputPeerChat
+		_, err := fmt.Sscanf(name, "cht[%d]", &chatPeer.ChatID)
+		if err != nil {
+			return nil, errors.Wrapf(err, "scan chat peer(%q)", name)
+		}
+
+		return &chatPeer, nil
+	default:
+		sender := message.NewSender(api)
+		inputPeer, err := sender.Resolve(name).AsInputPeer(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve name: %w", err)
+		}
+
+		return inputPeer, nil
+	}
 }
 
 type history struct {

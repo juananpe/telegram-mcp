@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/gotd/td/telegram/message"
 	"github.com/gotd/td/tg"
 	mcp "github.com/metoro-io/mcp-golang"
 	"github.com/pkg/errors"
@@ -27,14 +26,13 @@ func (c *Client) ReadHistory(args ReadArguments) (*mcp.ToolResponse, error) {
 	if err := client.Run(ctx, func(ctx context.Context) error {
 		api := client.API()
 
-		sender := message.NewSender(api)
-		inputPeer, err := sender.Resolve(args.Name).AsInputPeer(ctx)
+		inputPeer, err := getInputPeerFromName(ctx, api, args.Name)
 		if err != nil {
-			return fmt.Errorf("failed to resolve name: %w", err)
+			return fmt.Errorf("get inputPeer from name: %w", err)
 		}
 
 		switch p := inputPeer.(type) {
-		case *tg.InputPeerUser:
+		case *tg.InputPeerUser, *tg.InputPeerChat:
 			affectedMsgs, err = api.MessagesReadHistory(ctx, &tg.MessagesReadHistoryRequest{
 				Peer: inputPeer,
 			})
@@ -58,7 +56,6 @@ func (c *Client) ReadHistory(args ReadArguments) (*mcp.ToolResponse, error) {
 					PtsCount: 1,
 				}
 			}
-
 		default:
 			return fmt.Errorf("unexpected input peer type: %T", p)
 		}

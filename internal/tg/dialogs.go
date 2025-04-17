@@ -257,7 +257,6 @@ func (d *dialogs) processDialog(dialogItem *tg.Dialog) (DialogInfo, error) {
 			Text:     text,
 			IsUnread: dialogItem.UnreadCount > 0,
 		}
-
 	}
 
 	if dialogItem.Peer == nil {

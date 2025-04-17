@@ -50,7 +50,17 @@ func serve(ctx context.Context, cmd *cli.Command) error {
 
 		answer, err = client.GetHistory(tg.HistoryArguments{Name: os.Getenv("TG_TEST_USERNAME")})
 		if err != nil {
-			return fmt.Errorf("get histore: %w", err)
+			return fmt.Errorf("get nickname history: %w", err)
+		}
+
+		answer, err = client.GetHistory(tg.HistoryArguments{Name: "cht[4626931529]"})
+		if err != nil {
+			return fmt.Errorf("get chat history: %w", err)
+		}
+
+		answer, err = client.GetHistory(tg.HistoryArguments{Name: "chn[2225853048:8934705438195741763]"})
+		if err != nil {
+			return fmt.Errorf("get chan history: %w", err)
 		}
 
 		log.Info().RawJSON("answer", []byte(answer.Content[0].TextContent.Text)).Msg("Check GetHistory: OK")
@@ -82,17 +92,17 @@ func serve(ctx context.Context, cmd *cli.Command) error {
 		return fmt.Errorf("register dialogs tool: %w", err)
 	}
 
-	err = server.RegisterTool("tg_dialog", "Get messages of telegram dialog (channel, user)", client.GetHistory)
+	err = server.RegisterTool("tg_dialog", "Get messages of telegram dialog", client.GetHistory)
 	if err != nil {
 		return fmt.Errorf("register dialogs tool: %w", err)
 	}
 
-	err = server.RegisterTool("tg_send", "Send draft message to dialog (channel, user)", client.SendDraft)
+	err = server.RegisterTool("tg_send", "Send draft message to dialog", client.SendDraft)
 	if err != nil {
 		return fmt.Errorf("register dialogs tool: %w", err)
 	}
 
-	err = server.RegisterTool("tg_read", "Mark dialog messages as read (channel, user)", client.ReadHistory)
+	err = server.RegisterTool("tg_read", "Mark dialog messages as read", client.ReadHistory)
 	if err != nil {
 		return fmt.Errorf("register read tool: %w", err)
 	}

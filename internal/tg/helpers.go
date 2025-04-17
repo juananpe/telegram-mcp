@@ -32,9 +32,12 @@ func getUsername(source any) string {
 	case *tg.User:
 		username = u.Username
 	case *tg.Chat:
-		username = fmt.Sprintf("chat(%d)", u.ID)
+		username = fmt.Sprintf("cht[%d]", u.ID)
 	case *tg.Channel:
 		username = u.Username
+		if username == "" {
+			username = fmt.Sprintf("chn[%d:%d]", u.ID, u.AccessHash)
+		}
 	}
 
 	return username
