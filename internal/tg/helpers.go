@@ -30,7 +30,7 @@ func getUsername(source any) string {
 	var username string
 	switch u := source.(type) {
 	case *tg.User:
-		username = u.Username
+		username = fmt.Sprintf("user[%d]", u.ID)
 	case *tg.Chat:
 		username = fmt.Sprintf("cht[%d]", u.ID)
 	case *tg.Channel:

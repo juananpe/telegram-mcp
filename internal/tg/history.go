@@ -89,6 +89,14 @@ func getInputPeerFromName(ctx context.Context, api *tg.Client, name string) (tg.
 		}
 
 		return &chatPeer, nil
+	case strings.HasPrefix(name, "user") && isCustom:
+		var userPeer tg.InputPeerUser
+		_, err := fmt.Sscanf(name, "user[%d]", &userPeer.UserID)
+		if err != nil {
+			return nil, errors.Wrapf(err, "scan user peer(%q)", name)
+		}
+
+		return &userPeer, nil
 	default:
 		sender := message.NewSender(api)
 		inputPeer, err := sender.Resolve(name).AsInputPeer(ctx)
