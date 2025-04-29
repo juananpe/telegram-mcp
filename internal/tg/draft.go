@@ -35,12 +35,12 @@ func (c *Client) SendDraft(args DraftArguments) (*mcp.ToolResponse, error) {
 			Message: args.Text,
 		})
 		if err != nil {
-			return fmt.Errorf("failed to send draft: %w", err)
+			return fmt.Errorf("failed to get history: %w", err)
 		}
 
 		return nil
 	}); err != nil {
-		return nil, errors.Wrap(err, "failed to send draft")
+		return nil, errors.Wrap(err, "failed to get history")
 	}
 
 	jsonData, err := json.Marshal(DraftResponse{Success: ok})
