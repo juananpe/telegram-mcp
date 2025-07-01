@@ -17,10 +17,12 @@ func New(appID int, appHash, sessionPath string) *Client {
 }
 
 func (c *Client) T() *telegram.Client {
-	return telegram.NewClient(c.appID, c.appHash, telegram.Options{
+	opts := telegram.Options{
 		SessionStorage: &telegram.FileSessionStorage{
 			Path: c.sessionPath,
 		},
 		NoUpdates: true,
-	})
+	}
+	opts, _ = telegram.OptionsFromEnvironment(opts)
+	return telegram.NewClient(c.appID, c.appHash, opts)
 }
