@@ -8,11 +8,23 @@ import (
 
 	"github.com/chaindead/telegram-mcp/internal/tg"
 
+	"github.com/invopop/jsonschema"
 	mcp "github.com/metoro-io/mcp-golang"
 	"github.com/metoro-io/mcp-golang/transport/stdio"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v3"
 )
+
+const jsonSchemaDraft07 = "https://json-schema.org/draft-07/schema#"
+
+func init() {
+	// MCP clients like VS Code currently ship JSON Schema validators that only
+	// understand draft-07. The default generator in github.com/invopop/jsonschema
+	// emits draft 2020-12 metadata, which triggers runtime warnings about
+	// unsupported $dynamicRef usage. Force the generator to emit draft-07 schemas
+	// so the Telegram tools remain usable across clients.
+	jsonschema.Version = jsonSchemaDraft07
+}
 
 func serve(ctx context.Context, cmd *cli.Command) error {
 	appID := cmd.Int("app-id")
